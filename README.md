@@ -73,9 +73,6 @@ Multiple sequence alignment (`align_multiple`) calls an external MAFFT executabl
 ```python
 alignment = psp.align_multiple(sequences, launcher=('wsl',))
 ```
-
-MAFFT is not called if all sequences are identical. There is no fallback when MAFFT fails; an error is raised instead.
-
 ## Parallelism
 
 The neighbour-moment, residual and volume kernels are compiled with Numba and run in parallel across centres. Set the number of threads with the `NUMBA_NUM_THREADS` environment variable (before importing the package) or with `numba.set_num_threads(n)`. MAFFT's thread count is set with `align_multiple(..., threads=n)`.
