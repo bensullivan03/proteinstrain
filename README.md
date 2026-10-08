@@ -1,24 +1,26 @@
 # ProteinStrain
 
-ProteinStrain is a python package for finite strain analysis of protein structures. It compares corresponding atoms of (2 or more) protein structures. This package extends **PSA (Protein Strain Analysis)** by the Sartori Lab — <https://github.com/Sartori-Lab/PSA> — which introduced this formalism for proteins in:
+ProteinStrain is a Python package for finite strain analysis of protein structures. It compares corresponding atoms of (2 or more) protein structures. This package extends **PSA (Protein Strain Analysis)** by the Sartori Lab — <https://github.com/Sartori-Lab/PSA> — which introduced this formalism for proteins in:
 
 > P. Sartori and S. Leibler, *Evolutionary Conservation of Mechanical Strain Distributions in Functional Transitions of Protein Structures*, Phys. Rev. X **14**, 011042 (2024). <https://doi.org/10.1103/PhysRevX.14.011042>
 
-The package provides structure loading/preparation, sequence alignment, deformation gradient calculation, strain/stress/energy functions, geometry calculation and essential plots. The results can be written into `cif` structures using the B-factor column of an mmCIF copy.
+The package provides structure loading/preparation, sequence alignment, deformation gradient calculation, strain/stress/energy functions, geometry calculation and essential plots. The results can be written onto structures as mmCIF B-factors or displayed using interactive 3D viewers.
 
 ## Installation
 
-ProteinStrain needs Python 3.12 or later. [MAFFT](https://mafft.cbrc.jp/alignment/software/)  is optional and only needed for `align_multiple` in order to perform multiple sequence alignment.
+ProteinStrain needs Python 3.12 or later. [MAFFT](https://mafft.cbrc.jp/alignment/software/) is optional and only needed for `align_multiple` in order to perform multiple sequence alignment.
 
 ### Option 1: Install a release from GitHub
 
+Use a different version if necessary.
+
 ```sh
-python -m pip install "proteinstrain @ git+https://github.com/bensullivan03/proteinstrain.git"
+python -m pip install "proteinstrain @ git+https://github.com/bensullivan03/proteinstrain.git@v0.6.0"
 ```
 
 ### Option 2: Install a wheel
 
-Install it directly from its URL (use a different version if necessary).
+Install a release directly from its URL.
 
 ```sh
 python -m pip install https://github.com/bensullivan03/proteinstrain/releases/download/v0.6.0/proteinstrain-0.6.0-py3-none-any.whl
@@ -47,39 +49,40 @@ python -m pip install proteinstrain-0.6.0-py3-none-any.whl
 A directed strain calculation from a reference structure to a target structure:
 
 ```python
-import proteinstrain as psp
+import proteinstrain as ps
 from proteinstrain.mechanics.measures import green_lagrange_frobenius
 
-reference = psp.load_structure('reference.cif')
-target = psp.load_structure('target.cif')
-block = psp.from_pairwise(reference, target,
-                          reference_chains='A', chain_map={'A': 'B'}, atoms='CA')
-result = psp.calculate(block, *block.item_ids,
-                       rule=psp.WeightRule.tapered(4., 8.), ensemble='reference')
+reference = ps.load_structure('reference.cif')
+target = ps.load_structure('target.cif')
+block = ps.from_pairwise(reference, target,
+                        reference_chains='A', chain_map={'A': 'B'}, atoms='CA')
+result = ps.calculate(block, *block.item_ids,
+                      rule=ps.WeightRule.tapered(4., 8.), ensemble='reference')
 strain = green_lagrange_frobenius(result.F)
-table = psp.result_table(block, result, strain, name='strain')
-residues = psp.per_residue(table, 'mean', value='strain')
+table = ps.result_table(block, result, strain, name='strain')
+residues = ps.per_residue(table, 'mean', value='strain')
 residues.to_csv('strain.csv', index=False)
 ```
 
 Change the chain IDs and neighbourhood rule explicitly for your inputs. The package contains no protein-specific presets. `F[i]` belongs to `result.centre_indices[i]` in the aligned block. Failed fits have `valid=False` and `NaN` values.
 
-## Sequence alignment
+## Sequence Alignment
 
 Pairwise alignment (`align_pairwise`, used by `from_pairwise` and `from_reference_star`) is built in and uses Biopython's global aligner with BLOSUM62 scoring.
 
 Multiple sequence alignment (`align_multiple`) calls an external MAFFT executable. On Windows, MAFFT is most easily installed in WSL and called through it:
 
 ```python
-alignment = psp.align_multiple(sequences, launcher=('wsl',))
+alignment = ps.align_multiple(sequences, launcher=('wsl',))
 ```
+
 ## Parallelism
 
 The neighbour-moment, residual and volume kernels are compiled with Numba and run in parallel across centres. Set the number of threads with the `NUMBA_NUM_THREADS` environment variable (before importing the package) or with `numba.set_num_threads(n)`. MAFFT's thread count is set with `align_multiple(..., threads=n)`.
 
 ## Detailed Documentation
 
-The following documentation was drafted the help of AI. If there are any issues then please let me know. I intend to improve and expand it in the future.
+The following documentation was drafted with the help of AI. If there are any issues then please let me know. I intend to improve and expand it in the future.
 
 - [Structures, preparation and correspondence](docs/structures_and_correspondence.md)
 - [Deformation and direct measures](docs/calculations.md)

@@ -118,7 +118,6 @@ def align_multiple(
         path.write_text(_fasta(query))
         # WSL receives input on stdin to avoid host/guest path translation.
         command = [*launcher, str(executable), *flags, "--thread", str(threads), "-"]
-        print(command)
         try:
             result = subprocess.run(
                 command,

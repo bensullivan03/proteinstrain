@@ -1,47 +1,47 @@
 """Protein structures, explicit correspondence and finite-strain calculations."""
 
-__version__ = "0.5.0"
-from .structure import ProteinStructure
-from .io import (
-    load_structure,
-    save_structure,
-    load_assembly,
-    list_assemblies,
-    download_mmcif,
-    fetch_structure,
-)
+__version__ = "0.6.0"
+from . import constitutive, geometry, mechanics, plotting, preparation, synthetic
+from .calculation import calculate, calculate_pairs
 from .correspondence import (
     AlignedCoordinates,
+    align_multiple,
+    align_pairwise,
+    alignment_positions,
+    chain_sequence,
+    concat_blocks,
     extract,
-    from_pairwise,
     from_identity,
-    from_reference_star,
     from_msa,
     from_native_keys,
-    concat_blocks,
-    align_pairwise,
-    align_multiple,
-    chain_sequence,
-    alignment_positions,
+    from_pairwise,
+    from_reference_star,
     read_alignment,
     write_alignment,
 )
-from .calculation import calculate, calculate_pairs
+from .io import (
+    download_mmcif,
+    fetch_structure,
+    list_assemblies,
+    load_assembly,
+    load_structure,
+    save_structure,
+)
 from .mechanics import (
-    WeightRule,
     NeighbourGraph,
+    WeightRule,
     build_graph,
     deformation_gradient,
     reference_moments,
 )
 from .results import (
     DeformationResult,
-    result_table,
+    export_field,
     per_residue,
     remap_alignment,
-    export_field,
+    result_table,
 )
-from . import mechanics, constitutive, geometry, preparation, plotting, synthetic
+from .structure import ProteinStructure
 
 __all__ = [
     "ProteinStructure",
